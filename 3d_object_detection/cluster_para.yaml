@@ -1,0 +1,14 @@
+# PCD file path
+temp_data_path: "/home/sunho/catkin_ws/src/hmgchallenge/3d_object_detection/data_example/table_scene_lms400.pcd"
+
+
+# Choose whether to ust voxel grid filter
+use_voxelgrid: true
+
+ 
+# Select the data want to visualize
+# 0 : No visualization
+# 1 : Original Point Cloud data
+# 2 : Point Cloud data after voxel grid filter
+# 3 : Point Cloud data after plane removed
+visualize_cloud: 2
