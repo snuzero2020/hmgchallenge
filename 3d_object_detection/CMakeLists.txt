@@ -26,6 +26,20 @@ include_directories(${catkin_INCLUDE_DIRS})
 include_directories(${PCL_INCLUDE_DIRS})
 include_directories(include)
 
+add_library(cloud_visualize src/cloud_visualize.cpp)
+add_library(cluster_class src/cluster_class.cpp)
+
+set (SOURCES 
+ ${CMAKE_CURRENT_SOURCE_DIR}/src/cloud_visualize.cpp
+ ${CMAKE_CURRENT_SOURCE_DIR}/src/cluster_class.cpp
+)
+
+
+set (HEADERS
+ ${CMAKE_CURRENT_SOURCE_DIR}/include/cloud_visualize.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/include/cluster_class.h
+)
+
 add_executable(object_detection_main src/main.cpp ${HEADERS} ${SOURCES})
 add_dependencies(object_detection_main ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(object_detection_main ${catkin_LIBRARIES} ${OpenCV_LIBS} ${PCL_LIBRARIES})

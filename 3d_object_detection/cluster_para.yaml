@@ -11,4 +11,20 @@ use_voxelgrid: true
 # 1 : Original Point Cloud data
 # 2 : Point Cloud data after voxel grid filter
 # 3 : Point Cloud data after plane removed
-visualize_cloud: 2
+# 4 : Point Cloud data after clustering
+visualize_cloud: 4
+
+
+# Hyperparameter for voxel grid
+leaf_size : 0.01
+
+
+# Hyperparameter for plane remove
+max_iterations : 100
+distance_threshold : 0.02
+
+
+# Hyperparmerter for ecclidean clustering
+cluster_tolerance : 0.02
+min_cluster_size : 100
+max_cluster_size : 25000
