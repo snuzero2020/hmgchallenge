@@ -40,6 +40,6 @@ set (HEADERS
  ${CMAKE_CURRENT_SOURCE_DIR}/include/cluster_class.h
 )
 
-add_executable(object_detection_main src/main.cpp ${HEADERS} ${SOURCES})
-add_dependencies(object_detection_main ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(object_detection_main ${catkin_LIBRARIES} ${OpenCV_LIBS} ${PCL_LIBRARIES})
+add_executable(cluster_main src/cluster_main.cpp ${HEADERS} ${SOURCES})
+add_dependencies(cluster_main ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(cluster_main ${catkin_LIBRARIES} ${OpenCV_LIBS} ${PCL_LIBRARIES})
