@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="object_cluster" name="clustering" type="cluster_main" />
+  <rosparam file="$(find object_cluster)/cluster_para.yaml" />
+</launch>

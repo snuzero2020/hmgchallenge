@@ -1,4 +1,0 @@
-<launch>
-  <node pkg="3d_object_detection" name="clustering" type="object_detection_main" />
-  <rosparam file="$(find 3d_object_detection)/cluster_para.yaml" />
-</launch>
