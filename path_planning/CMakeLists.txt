@@ -25,14 +25,19 @@ include_directories(${catkin_INCLUDE_DIRS})
 include_directories(${EIGEN3_INCLUDE_DIRS})
 include_directories(include)
 
-add_library(multi_img_utils src/quintic_polynomial.cpp)
+add_library(quartic_polynomial src/quartic_polynomial.cpp)
+add_library(quintic_polynomial src/quintic_polynomial.cpp)
+
 
 set (SOURCES 
+ ${CMAKE_CURRENT_SOURCE_DIR}/src/quartic_polynomial.cpp
  ${CMAKE_CURRENT_SOURCE_DIR}/src/quintic_polynomial.cpp
 )
 
 set (HEADERS
+ ${CMAKE_CURRENT_SOURCE_DIR}/include/quartic_polynomial.h
  ${CMAKE_CURRENT_SOURCE_DIR}/include/quintic_polynomial.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/include/utils.h
 )
 
 add_executable(frenet_optimal_trajectory src/frenet_optimal_trajectory.cpp ${HEADERS} ${SOURCES})
