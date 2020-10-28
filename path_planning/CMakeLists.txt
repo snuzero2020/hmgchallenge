@@ -32,6 +32,7 @@ add_library(cubic_spline_1d src/cubic_spline_1d.cpp)
 add_library(cubic_spline_2d src/cubic_spline_2d.cpp)
 add_library(obstacle src/obstacle.cpp)
 add_library(frenet_path src/frenet_path.cpp)
+add_library(frenet_optimal_trajectory src/frenet_optimal_trajectory.cpp)
 
 
 set (SOURCES 
@@ -42,6 +43,7 @@ set (SOURCES
  ${CMAKE_CURRENT_SOURCE_DIR}/src/cubic_spline_2d.cpp
  ${CMAKE_CURRENT_SOURCE_DIR}/src/obstacle.cpp
  ${CMAKE_CURRENT_SOURCE_DIR}/src/frenet_path.cpp
+ ${CMAKE_CURRENT_SOURCE_DIR}/src/frenet_optimal_trajectory.cpp
 )
 
 set (HEADERS
@@ -54,8 +56,9 @@ set (HEADERS
  ${CMAKE_CURRENT_SOURCE_DIR}/include/obstacle.h
  ${CMAKE_CURRENT_SOURCE_DIR}/include/cpp_struct.h
  ${CMAKE_CURRENT_SOURCE_DIR}/include/frenet_path.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/include/frenet_optimal_trajectory.h
 )
 
-add_executable(frenet_optimal_trajectory src/frenet_optimal_trajectory.cpp ${HEADERS} ${SOURCES})
-add_dependencies(frenet_optimal_trajectory ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(frenet_optimal_trajectory ${catkin_LIBRARIES} ${OpenCV_LIBS} Eigen3::Eigen)
+add_executable(frenet_optimal_trajectory_main src/main.cpp ${HEADERS} ${SOURCES})
+add_dependencies(frenet_optimal_trajectory_main ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(frenet_optimal_trajectory_main ${catkin_LIBRARIES} ${OpenCV_LIBS} Eigen3::Eigen)
