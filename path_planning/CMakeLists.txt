@@ -27,17 +27,33 @@ include_directories(include)
 
 add_library(quartic_polynomial src/quartic_polynomial.cpp)
 add_library(quintic_polynomial src/quintic_polynomial.cpp)
+add_library(car src/car.cpp)
+add_library(cubic_spline_1d src/cubic_spline_1d.cpp)
+add_library(cubic_spline_2d src/cubic_spline_2d.cpp)
+add_library(obstacle src/obstacle.cpp)
+add_library(frenet_path src/frenet_path.cpp)
 
 
 set (SOURCES 
  ${CMAKE_CURRENT_SOURCE_DIR}/src/quartic_polynomial.cpp
  ${CMAKE_CURRENT_SOURCE_DIR}/src/quintic_polynomial.cpp
+ ${CMAKE_CURRENT_SOURCE_DIR}/src/car.cpp
+ ${CMAKE_CURRENT_SOURCE_DIR}/src/cubic_spline_1d.cpp
+ ${CMAKE_CURRENT_SOURCE_DIR}/src/cubic_spline_2d.cpp
+ ${CMAKE_CURRENT_SOURCE_DIR}/src/obstacle.cpp
+ ${CMAKE_CURRENT_SOURCE_DIR}/src/frenet_path.cpp
 )
 
 set (HEADERS
  ${CMAKE_CURRENT_SOURCE_DIR}/include/quartic_polynomial.h
  ${CMAKE_CURRENT_SOURCE_DIR}/include/quintic_polynomial.h
  ${CMAKE_CURRENT_SOURCE_DIR}/include/utils.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/include/car.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/include/cubic_spline_1d.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/include/cubic_spline_2d.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/include/obstacle.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/include/cpp_struct.h
+ ${CMAKE_CURRENT_SOURCE_DIR}/include/frenet_path.h
 )
 
 add_executable(frenet_optimal_trajectory src/frenet_optimal_trajectory.cpp ${HEADERS} ${SOURCES})
