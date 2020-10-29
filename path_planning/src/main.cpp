@@ -3,6 +3,8 @@
 #include "cpp_struct.h"
 #include "ros/ros.h"
 #include "opencv2/opencv.hpp"
+#include "quintic_polynomial.h"
+#include "quartic_polynomial.h"
 #include <ctime>
 
 #include <iostream>
@@ -82,13 +84,6 @@ int main(int argc, char** argv) {
             cout << "Failure\n";
         }
 
-        fot_ic.s0 = best_frenet_path->s[2];
-        fot_ic.c_speed = best_frenet_path->s_d[2];
-        fot_ic.c_d = best_frenet_path->d[2];
-        fot_ic.c_d_d = best_frenet_path->d_d[2];
-        fot_ic.c_d_dd = best_frenet_path->d_dd[2];
-
-
         cv::Mat VisWindow(IMAGE_SIZE, IMAGE_SIZE, CV_8UC3, cv::Scalar(255, 255, 255));
 
         for (int i=0; i<fot_ic.no; i++){
@@ -111,6 +106,17 @@ int main(int argc, char** argv) {
 
         cv::imshow("Path_Visualize", VisWindow);
         cv::waitKey(1);
+
+        if(abs(t_s - best_frenet_path->s.front()) < 10)
+            break;
+
+        fot_ic.s0 = best_frenet_path->s[1];
+        fot_ic.c_speed = best_frenet_path->s_d[1];
+        fot_ic.c_d = best_frenet_path->d[1];
+        fot_ic.c_d_d = best_frenet_path->d_d[1];
+        fot_ic.c_d_dd = best_frenet_path->d_dd[1];
     }
+    cv::destroyAllWindows();
+    
     return 0;
 }

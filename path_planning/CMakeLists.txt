@@ -62,3 +62,4 @@ set (HEADERS
 add_executable(frenet_optimal_trajectory_main src/main.cpp ${HEADERS} ${SOURCES})
 add_dependencies(frenet_optimal_trajectory_main ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(frenet_optimal_trajectory_main ${catkin_LIBRARIES} ${OpenCV_LIBS} Eigen3::Eigen)
+set_target_properties(frenet_optimal_trajectory_main PROPERTIES COMPILE_FLAGS "-O3")
