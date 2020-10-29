@@ -17,6 +17,7 @@ public:
     FrenetOptimalTrajectory(FrenetInitialConditions *fot_ic_, FrenetHyperparameters *fot_hp_);
     ~FrenetOptimalTrajectory();
     FrenetPath* getBestPath();
+    CubicSpline2D* getcsp();
     void setObstacles();
     void addObstacle(Vector2f first_point, Vector2f second_point);
 private:

@@ -35,8 +35,8 @@ FrenetOptimalTrajectory::FrenetOptimalTrajectory(FrenetInitialConditions *fot_ic
     }
     auto end = chrono::high_resolution_clock::now();
     double run_time = chrono::duration_cast<chrono::nanoseconds>(end - start).count();
-    run_time *= 1e-6;
-    cout << "Planning runtime " << run_time << "\n";
+    run_time *= 1e-9;
+    cout << "Planning runtime " << run_time << endl;
 }
 
 FrenetOptimalTrajectory::~FrenetOptimalTrajectory() {
@@ -48,6 +48,10 @@ FrenetOptimalTrajectory::~FrenetOptimalTrajectory() {
     for (Obstacle* ob : obstacles) {
         delete ob;
     }
+}
+
+CubicSpline2D* FrenetOptimalTrajectory::getcsp(){
+    return csp;
 }
 
 FrenetPath* FrenetOptimalTrajectory::getBestPath() {

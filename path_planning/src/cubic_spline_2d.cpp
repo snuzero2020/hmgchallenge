@@ -111,3 +111,7 @@ bool CubicSpline2D::are_collinear(double x1, double y1, double x2, double y2,
                x3 * (y1 - y2);
     return a <= 0.01;
 }
+
+double CubicSpline2D::calc_s_length(){
+    return s.back();
+}

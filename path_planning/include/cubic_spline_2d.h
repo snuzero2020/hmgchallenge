@@ -21,6 +21,7 @@ class CubicSpline2D{
         double calc_curvature(double t);
         double calc_yaw(double t);
         double find_s(double x, double y, double s0);
+        double calc_s_length();
 };
 
 #endif

@@ -1,4 +1,4 @@
 <launch>
-  <node pkg="path_planning" name="frenet_optimal_trajectory" type="frenet_optimal_trajectory" />
-  <rosparam file="$(find frenet_optimal_trajectory)/frenet_optimal_trajectory.yaml" />
+  <node pkg="path_planning" name="frenet_optimal_trajectory" type="frenet_optimal_trajectory_main" />
+  <rosparam file="$(find path_planning)/frenet_optimal_trajectory.yaml" />
 </launch>

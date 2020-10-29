@@ -6,7 +6,7 @@ using namespace std;
 
 Obstacle::Obstacle(Vector2f first_point, Vector2f second_point, double obstacle_clearance)
 {
-    // Get topLeft and bottomRight points from the given points.
+    // Get tansLeft and bottomRight points from the given points.
     Vector2f tmp;
     if (first_point.x() > second_point.x() && first_point.y() > second_point.y()) {
         tmp = first_point;
@@ -70,26 +70,27 @@ bool Obstacle::isSegmentInObstacle(Vector2f &p1, Vector2f &p2)
     x3 = checkIntersect(p1, p2, l3_p1, l3_p2);
     x4 = checkIntersect(p1, p2, l4_p1, l4_p2);
 
-    return x1 && x2 && x3 && x4;
+    return x1 || x2 || x3 || x4;
 }
 
 bool Obstacle::checkIntersect(Vector2f p1, Vector2f p2, Vector2f l_p1, Vector2f l_p2)
 {
     int x1 = ccw(p1, p2, l_p1) * ccw(p1, p2, l_p2);
     int x2 = ccw(l_p1, l_p2, p1) * ccw(l_p1, l_p2, p2);
+    
     if (x1 == 0 && x2 == 0){
         if((p1.x()>l_p1.x() && p1.x()>l_p2.x() && p2.x()>l_p1.x() && p2.x()>l_p2.x()) || (l_p1.x()>p1.x() && l_p1.x()>p2.x() && l_p2.x()>p1.x() && l_p2.x()>p2.x()))
             return false;
         else if((p1.y()>l_p1.y() && p1.y()>l_p2.y() && p2.y()>l_p1.y() && p2.y()>l_p2.y()) || (l_p1.y()>p1.y() && l_p1.y()>p2.y() && l_p2.y()>p1.y() && l_p2.y()>p2.y()))
             return false;
     }
+    
     return (x1 <= 0)&&(x2 <= 0);
 }
 
 int Obstacle::ccw(Vector2f p1, Vector2f p2, Vector2f p3)
 {
-    double ans = (p2.x()-p1.x()) * (p3.y()-p1.y()) - (p2.y()-p1.y())* (p3.x()-p1.x());
-    
+    double ans = (p2.x()-p1.x()) * (p3.y()-p1.y()) - (p2.y()-p1.y())* (p3.x()-p1.x()); 
     if (ans < 0) 
         return 1;
     else if (ans > 0) 
