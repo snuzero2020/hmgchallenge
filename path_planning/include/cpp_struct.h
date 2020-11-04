@@ -6,6 +6,7 @@ const int MAX_PATH_LENGTH = 100;
 struct FrenetInitialConditions {
     double s0;
     double c_speed;
+    double c_accel;
     double c_d;
     double c_d_d;
     double c_d_dd;

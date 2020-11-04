@@ -32,6 +32,7 @@ int main(int argc, char** argv) {
         0.0,
         0.0,
         0.0,
+        0.0,
         20.0,
         wx,
         wy,
@@ -113,6 +114,7 @@ int main(int argc, char** argv) {
 
         fot_ic.s0 = best_frenet_path->s[1];
         fot_ic.c_speed = best_frenet_path->s_d[1];
+        fot_ic.c_accel = best_frenet_path->s_dd[1];
         fot_ic.c_d = best_frenet_path->d[1];
         fot_ic.c_d_d = best_frenet_path->d_d[1];
         fot_ic.c_d_dd = best_frenet_path->d_dd[1];

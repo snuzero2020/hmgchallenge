@@ -120,7 +120,7 @@ void FrenetOptimalTrajectory::calc_frenet_paths() {
                 tfp->d_d.assign(fp->d_d.begin(), fp->d_d.end());
                 tfp->d_dd.assign(fp->d_dd.begin(), fp->d_dd.end());
                 tfp->d_ddd.assign(fp->d_ddd.begin(), fp->d_ddd.end());
-                QuarticPolynomial lon_qp = QuarticPolynomial(fot_ic->s0, fot_ic->c_speed, 0.0, tv, 0.0, ti);
+                QuarticPolynomial lon_qp = QuarticPolynomial(fot_ic->s0, fot_ic->c_speed, fot_ic->c_accel, tv, 0.0, ti);
 
                 for (double tp : tfp->t) {
                     tfp->s.push_back(lon_qp.calc_point(tp));
