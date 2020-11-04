@@ -2,6 +2,7 @@
 #define FRENET_OPTIMAL_TRAJECTORY_CUBIC_SPLINE_2D
 
 #include "cubic_spline_1d.h"
+#include "utils.h"
 #include <vector>
 
 using namespace std;
@@ -21,6 +22,7 @@ class CubicSpline2D{
         double calc_curvature(double t);
         double calc_yaw(double t);
         double find_s(double x, double y, double s0);
+        SLState transform(PoseState ps);
         double calc_s_length();
 };
 

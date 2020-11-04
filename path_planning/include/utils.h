@@ -55,6 +55,16 @@ class PoseState{
         }
 };
 
+struct SLState{
+    public:
+        double s;
+        double l;
+        double ds;
+        double dl;
+        double dds;
+        double ddl;
+};
+
 inline double norm(double x, double y){
     return sqrt(pow(x,2) + pow(y,2));
 }
@@ -70,4 +80,15 @@ inline void as_unit_vector(tuple<double, double>& vec){
 inline double dot(const tuple<double, double>& vec1, const tuple<double, double>& vec2){
     return get<0>(vec1) * get<0>(vec2) + get<1>(vec1) * get<1>(vec2);
 }
+
+inline double distance_to_segment(double x, double y, double x1, double y1, double x2, double y2){
+    double dx2 = x2 - x1;
+    double dy2 = y2 - y1;
+    double dx = x - x1;
+    double dy = y - y1;
+    if(dx*dx2 + dy*dy2 <=0) return norm(dx,dy);
+    if(dx*dx2 + dy*dy2 >=norm(dx2,dy2)) return norm(dx-dx2,dy-dy2);
+    return abs(dx*dy2 - dy*dx2)/norm(dx2,dy2);
+}
+
 #endif
