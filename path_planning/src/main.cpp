@@ -101,7 +101,8 @@ int main(int argc, char** argv) {
         }
 
         for (int i=0; i<best_frenet_path->x.size(); i++){
-            cv::circle(VisWindow, cv::Point(IMAGE_SCALE * int(best_frenet_path->x[i]),IMAGE_SIZE/2 - int(IMAGE_SCALE*best_frenet_path->y[i])),5, cv::Scalar(0, 0, 255));
+            if(i==0) cv::circle(VisWindow, cv::Point(IMAGE_SCALE * int(best_frenet_path->x[i]),IMAGE_SIZE/2 - int(IMAGE_SCALE*best_frenet_path->y[i])),5, cv::Scalar(0, 0, 255), 2);
+            else cv::circle(VisWindow, cv::Point(IMAGE_SCALE * int(best_frenet_path->x[i]),IMAGE_SIZE/2 - int(IMAGE_SCALE*best_frenet_path->y[i])),5, cv::Scalar(0, 0, 255));
         }
 
         cv::imshow("Path_Visualize", VisWindow);
