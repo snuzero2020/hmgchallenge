@@ -60,7 +60,7 @@ double CubicSpline2D::calc_yaw(double t) {
 
 double CubicSpline2D::find_s(double x, double y, double s0) {
     // 가장 가까운 i-1 to i 선분을 찾음 
-    double i_closest = 1;
+    int i_closest = 1;
     double closest = INFINITY;
     int ssize = s.size();
     double s1 = s[0]; 
@@ -82,9 +82,9 @@ double CubicSpline2D::find_s(double x, double y, double s0) {
         y1 = y2;
     }
     // i-2 to i+1 세 선분만 탐색
-    double s_closest = s[i];
+    double s_closest = s[i_closest];
     closest = INFINITY;
-    double si = s[max(0,i-2)];
+    double si = s[max(0,i_closest-2)];
     do {
         double px = calc_x(si);
         double py = calc_y(si);
@@ -93,8 +93,8 @@ double CubicSpline2D::find_s(double x, double y, double s0) {
             closest = dist;
             s_closest = si;
         }
-        si += 0.03;
-    } while (si < s[min(ssize-1,i+1)]);
+        si += 0.001;
+    } while (si < s[min(ssize-1,i_closest+1)]);
     return s_closest;
 }
 
@@ -108,11 +108,12 @@ SLState CubicSpline2D::transform(PoseState ps){
     Pose p = ps.getPose();
     p[2] = pyaw;
     PoseState transformed = ps.transform(p);
-    sls.l = norm(ps.x-px,ps.y-py);
+    sls.l = (ps.x-px)*(-sin(pyaw)) + (ps.y-py)*cos(pyaw);
     sls.ds = transformed.vx/(1-pcurvature*sls.l);
     sls.dl = transformed.vy;
-    sls.dds = transformed.ax + transformed.vx*transformed.vy*pcurvature*(1-pcurvature*sls.l)*(1-pcurvature*sls.l);
+    sls.dds = transformed.ax/(1-pcurvature*sls.l) + transformed.vx*transformed.vy*pcurvature/((1-pcurvature*sls.l)*(1-pcurvature*sls.l));
     sls.ddl = transformed.ay + pcurvature*transformed.vx*transformed.vx;
+    return sls;
 }
 
 vector<vector<double>>

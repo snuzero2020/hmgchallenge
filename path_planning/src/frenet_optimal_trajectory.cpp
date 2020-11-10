@@ -4,14 +4,16 @@
 #include "quintic_polynomial.h"
 #include "quartic_polynomial.h"
 #include "utils.h"
+#include "ros/console.h"
 
 using namespace std;
 
-FrenetOptimalTrajectory::FrenetOptimalTrajectory(FrenetInitialConditions *fot_ic_, FrenetHyperparameters *fot_hp_) {
+FrenetOptimalTrajectory::FrenetOptimalTrajectory(FrenetInitialConditions *fot_ic_, FrenetHyperparameters *fot_hp_, CubicSpline2D *csp_) {
     auto start = chrono::high_resolution_clock::now();
     
     fot_ic = fot_ic_;
     fot_hp = fot_hp_;
+    csp = csp_;
     x.assign(fot_ic->wx, fot_ic->wx + fot_ic->nw);
     y.assign(fot_ic->wy, fot_ic->wy + fot_ic->nw);
     setObstacles();
@@ -22,8 +24,8 @@ FrenetOptimalTrajectory::FrenetOptimalTrajectory(FrenetInitialConditions *fot_ic
         return;
     }
 
-    csp = new CubicSpline2D(x, y);
-
+    //csp = new CubicSpline2D(x, y);
+    
     calc_frenet_paths();
 
     double mincost = INFINITY;
@@ -33,6 +35,9 @@ FrenetOptimalTrajectory::FrenetOptimalTrajectory(FrenetInitialConditions *fot_ic
             best_frenet_path = fp;
         }
     }
+    if(best_frenet_path==nullptr){
+        ROS_ERROR("No Path Error");
+    }
     auto end = chrono::high_resolution_clock::now();
     double run_time = chrono::duration_cast<chrono::nanoseconds>(end - start).count();
     run_time *= 1e-9;
@@ -40,7 +45,7 @@ FrenetOptimalTrajectory::FrenetOptimalTrajectory(FrenetInitialConditions *fot_ic
 }
 
 FrenetOptimalTrajectory::~FrenetOptimalTrajectory() {
-    delete csp;
+    //delete csp;
     for (FrenetPath* fp : frenet_paths) {
         delete fp;
     }

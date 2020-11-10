@@ -1,5 +1,6 @@
 #include "car.h"
 #include <cmath>
+#include "ros/console.h"
 
 void Car::setPose(Pose p){
     pose = p;
@@ -48,25 +49,25 @@ PoseState Car::simulate( double accel, double steer, double dt ){
     double curvature = steer*rear_length/(front_length*front_length + rear_length*rear_length);
     // transformed.x, transformed.y == 0
     // transformed.vy ==? 0
-    transformed.vy *= pow(0.5,dt);  //일단 야매임
-
+    transformed.vy =0;  //일단 야매임
+    
     transformed.ax = accel;
     transformed.ay = curvature*transformed.vx*transformed.vx;
+    transformed.yawrate = curvature*transformed.vx;
+
     transformed.x += transformed.vx*dt + 0.5*transformed.ax*dt*dt;
     transformed.y += transformed.vy*dt + 0.5*transformed.ay*dt*dt;
     transformed.vx += transformed.ax*dt;
     transformed.vy += transformed.ay*dt;
-
     transformed.yaw += curvature*transformed.x;
     transformed.yaw = remainder(transformed.yaw,2*M_PI);
-    transformed.yawrate = curvature*transformed.vx;
-
+    
     return transformed.transform(poseState.getPose(), true);
 }
 
 vector<double> Car::findAccelSteer( double accel, double curvature ){
     vector<double> accelSteer;
-    accelSteer[0] = accel;
-    accelSteer[1] = curvature*(front_length*front_length + rear_length*rear_length)/rear_length;
+    accelSteer.push_back(accel);
+    accelSteer.push_back(curvature*(front_length*front_length + rear_length*rear_length)/rear_length);
     return accelSteer;
 }

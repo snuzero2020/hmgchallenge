@@ -2,9 +2,11 @@
 #include "frenet_path.h"
 #include "cpp_struct.h"
 #include "ros/ros.h"
+#include "ros/console.h"
 #include "opencv2/opencv.hpp"
 #include "quintic_polynomial.h"
 #include "quartic_polynomial.h"
+#include "utils.h"
 #include <ctime>
 
 #include <iostream>
@@ -67,13 +69,31 @@ int main(int argc, char** argv) {
     ros::param::get("/klat", fot_hp.klat);
     ros::param::get("/klon", fot_hp.klon);
 
+
+    //working
+    vector<double> x,y;
+    x.assign(fot_ic.wx, fot_ic.wx + fot_ic.nw);
+    y.assign(fot_ic.wy, fot_ic.wy + fot_ic.nw);
+    CubicSpline2D *csp = new CubicSpline2D(x, y);
+    Car car;
+
     while(1){
         clock_t startTime = clock();
-        
-        FrenetOptimalTrajectory fot = FrenetOptimalTrajectory(&fot_ic, &fot_hp);
+
+        SLState sls = csp->transform(car.poseState);
+        // fot_ic.s0 = sls.s;
+        // fot_ic.c_speed = sls.ds;
+        // fot_ic.c_accel = sls.dds;
+        // fot_ic.c_d = sls.l;
+        // fot_ic.c_d_d = sls.dl;
+        // fot_ic.c_d_dd = sls.ddl;
+        ROS_WARN("%lf %lf %lf %lf %lf",sls.s, car.poseState.x, sls.l, car.poseState.y, car.poseState.yaw);
+
+        //FrenetOptimalTrajectory fot = FrenetOptimalTrajectory(&fot_ic, &fot_hp);
+        FrenetOptimalTrajectory fot = FrenetOptimalTrajectory(&fot_ic, &fot_hp, csp);
         FrenetPath* best_frenet_path = fot.getBestPath();
-        CubicSpline2D* csp = fot.getcsp();
-        
+        //CubicSpline2D* csp = fot.getcsp();
+
         clock_t endTime = clock();
         clock_t elapsed = endTime - startTime;
         double timeInSecond = (double)(elapsed / CLOCKS_PER_SEC);
@@ -106,8 +126,10 @@ int main(int argc, char** argv) {
             else cv::circle(VisWindow, cv::Point(IMAGE_SCALE * int(best_frenet_path->x[i]),IMAGE_SIZE/2 - int(IMAGE_SCALE*best_frenet_path->y[i])),5, cv::Scalar(0, 0, 255));
         }
 
+        ROS_WARN("%lf         %lf",best_frenet_path->x[1], best_frenet_path->y[1]);
+
         cv::imshow("Path_Visualize", VisWindow);
-        cv::waitKey(1);
+        cv::waitKey(10);
 
         if(abs(t_s - best_frenet_path->s.front()) < 10)
             break;
@@ -118,6 +140,9 @@ int main(int argc, char** argv) {
         fot_ic.c_d = best_frenet_path->d[1];
         fot_ic.c_d_d = best_frenet_path->d_d[1];
         fot_ic.c_d_dd = best_frenet_path->d_dd[1];
+
+        vector<double> accel_steer = car.findAccelSteer(best_frenet_path->accel[1],best_frenet_path->c[1]);
+        car.setPose(car.simulate(accel_steer[0], accel_steer[1], 0.2));
     }
     cv::destroyAllWindows();
     

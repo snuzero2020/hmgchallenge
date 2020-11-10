@@ -14,7 +14,7 @@ using namespace Eigen;
 
 class FrenetOptimalTrajectory {
 public:
-    FrenetOptimalTrajectory(FrenetInitialConditions *fot_ic_, FrenetHyperparameters *fot_hp_);
+    FrenetOptimalTrajectory(FrenetInitialConditions *fot_ic_, FrenetHyperparameters *fot_hp_, CubicSpline2D *csp_);
     ~FrenetOptimalTrajectory();
     FrenetPath* getBestPath();
     CubicSpline2D* getcsp();

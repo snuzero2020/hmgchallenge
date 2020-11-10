@@ -12,19 +12,20 @@ typedef vector<double> Pose;
 
 class PoseState{
     public:
-        double x;
-        double y;
-        double yaw;
-        double vx;
-        double vy;
-        double yawrate;
-        double ax;
-        double ay;
+        double x=0;
+        double y=0;
+        double yaw=0;
+        double vx=0;
+        double vy=0;
+        double yawrate=0;
+        double ax=0;
+        double ay=0;
         Pose getPose(){
             Pose pose;
-            pose[0] = x;
-            pose[1] = y;
-            pose[2] = yaw;
+            pose.push_back(x);
+            pose.push_back(y);
+            pose.push_back(yaw);
+            return pose;
         }
         void setPose(Pose pose){
             x = pose[0];

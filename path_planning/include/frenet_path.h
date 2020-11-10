@@ -31,6 +31,7 @@ public:
     vector<double> yaw;        // yaw in rad
     vector<double> ds;         // speed
     vector<double> c;          // curvature
+    vector<double> accel;      // acceleration
 
     // Debug
     vector<double> ix;

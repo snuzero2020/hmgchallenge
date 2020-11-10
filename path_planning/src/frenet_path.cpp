@@ -10,7 +10,7 @@ FrenetPath::FrenetPath(FrenetHyperparameters *fot_hp_) {
 }
 
 bool FrenetPath::to_global_path(CubicSpline2D* csp) {
-    double ix_, iy_, iyaw_, di, fx, fy, dx, dy;
+    double ix_, iy_, iyaw_, icurvature_, di, fx, fy, dx, dy, ddx, ddy;
     // calc global positions
     for (size_t i = 0; i < s.size(); i++) {
         ix_ = csp->calc_x(s[i]);
@@ -26,30 +26,40 @@ bool FrenetPath::to_global_path(CubicSpline2D* csp) {
         fy = iy_ + di * sin(iyaw_ + M_PI_2);
         x.push_back(fx);
         y.push_back(fy);
+
+        icurvature_ = csp->calc_curvature(s[i]);
+        dx = s_d[i] * (1-icurvature_*d[i]) * cos(iyaw_) - d_d[i] * sin(iyaw_);
+        dy = s_d[i] * (1-icurvature_*d[i]) * sin(iyaw_) + d_d[i] * cos(iyaw_);
+        ddx = (s_dd[i]*(1-icurvature_*d[i]) - s_d[i]*d_d[i]*icurvature_) * cos(iyaw_) - d_dd[i] * sin(iyaw_);
+        ddy = (s_dd[i]*(1-icurvature_*d[i]) - s_d[i]*d_d[i]*icurvature_) * sin(iyaw_) + d_dd[i] * cos(iyaw_);
+        ds.push_back(hypot(dx,dy));
+        yaw.push_back(atan2(dy,dx));
+        c.push_back( (dx*ddy - ddx*dy) / (hypot(dx,dy)*hypot(dx,dy)*hypot(dx,dy))  );
+        accel.push_back(hypot(ddx,ddy));
     }
 
-    if (x.size() <= 1) {
-        return false;
-    }
+    // if (x.size() <= 1) {
+    //     return false;
+    // }
 
-    for (size_t i = 0; i < x.size() - 1; i++) {
-        dx = x[i+1] - x[i];
-        dy = y[i+1] - y[i];
-        yaw.push_back(atan2(dy, dx));
-        ds.push_back(hypot(dx, dy));
-    }
-    yaw.push_back(yaw.back());
-    ds.push_back(ds.back());
+    // for (size_t i = 0; i < x.size() - 1; i++) {
+    //     dx = x[i+1] - x[i];
+    //     dy = y[i+1] - y[i];
+    //     yaw.push_back(atan2(dy, dx));
+    //     ds.push_back(hypot(dx, dy));
+    // }
+    // yaw.push_back(yaw.back());
+    // ds.push_back(ds.back());
 
-    for (size_t i = 0; i < yaw.size() - 1; i++) {
-        double dyaw = yaw[i+1] - yaw[i];
-        if (dyaw > M_PI_2) {
-            dyaw -= M_PI;
-        } else if (dyaw < -M_PI_2) {
-            dyaw += M_PI;
-        }
-        c.push_back(dyaw / ds[i]);
-    }
+    // for (size_t i = 0; i < yaw.size() - 1; i++) {
+    //     double dyaw = yaw[i+1] - yaw[i];
+    //     if (dyaw > M_PI_2) {
+    //         dyaw -= M_PI;
+    //     } else if (dyaw < -M_PI_2) {
+    //         dyaw += M_PI;
+    //     }
+    //     c.push_back(dyaw / ds[i]);
+    // }
 
     return true;
 }

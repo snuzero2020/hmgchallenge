@@ -25,15 +25,21 @@ class Car {
         double tail_length;
         //total_length = head_length + tail_length;
         double width;
+    
+    public:
         Pose pose; // x, y, yaw
         PoseState poseState; // x, y, yaw, vx, vy, yawrate, ax, ay
-    public:
+    
         Car(){
             front_length = VEHICLE_FRONT_LENGTH;
             rear_length = VEHICLE_REAR_LENGTH;
             head_length = VEHICLE_FRONT_OVERHANG + VEHICLE_FRONT_LENGTH + VEHICLE_REAR_LENGTH + VEHICLE_REAR_OVERHANG - VEHICLE_ORGIN_FROM_REAR;
             tail_length = VEHICLE_ORGIN_FROM_REAR;
             width = VEHICLE_WIDTH;
+            pose.push_back(0);
+            pose.push_back(0);
+            pose.push_back(0);
+            setPose(pose);
         };
         Car(Pose pose_): pose(pose_) {
             front_length = VEHICLE_FRONT_LENGTH;
@@ -41,6 +47,7 @@ class Car {
             head_length = VEHICLE_FRONT_OVERHANG + VEHICLE_FRONT_LENGTH + VEHICLE_REAR_LENGTH + VEHICLE_REAR_OVERHANG - VEHICLE_ORGIN_FROM_REAR;
             tail_length = VEHICLE_ORGIN_FROM_REAR;
             width = VEHICLE_WIDTH;
+            setPose(pose);
         };
         void setPose(Pose p);
         void setPose(PoseState ps);
