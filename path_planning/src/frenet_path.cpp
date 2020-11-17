@@ -2,7 +2,9 @@
 #include "utils.h"
 #include "ros/console.h"
 
+#include <math.h>
 #include <algorithm>
+
 
 const float COLLISION_CHECK_THRESHOLD = 6; 
 
@@ -36,8 +38,7 @@ bool FrenetPath::to_global_path(CubicSpline2D* csp) {
         ds.push_back(hypot(dx,dy));
         yaw.push_back(atan2(dy,dx));
         c.push_back( (dx*ddy - ddx*dy) / (hypot(dx,dy)*hypot(dx,dy)*hypot(dx,dy))  );
-        if(dx*ddx+dy*ddy >=0) accel.push_back(hypot(ddx,ddy));
-        else accel.push_back(-hypot(ddx,ddy));
+        accel.push_back( (dx*ddx+dy*ddy)/hypot(dx,dy) );
     }
 
     // if (x.size() <= 1) {
@@ -73,7 +74,12 @@ bool FrenetPath::is_valid_path(const vector<Obstacle *> obstacles) {
     }
     
     else if (any_of(s_dd.begin(), s_dd.end(),
-            [this](int i){return abs(i) > fot_hp->max_accel;})) {
+            [this](int i){return i > fot_hp->max_accel;})) {
+        return false;
+    }
+
+    else if (any_of(s_dd.begin(), s_dd.end(),
+            [this](int i){return i < -fot_hp->max_break;})) {
         return false;
     }
     
@@ -91,7 +97,6 @@ bool FrenetPath::is_valid_path(const vector<Obstacle *> obstacles) {
 }
 
 bool FrenetPath::is_collision(const vector<Obstacle *> obstacles) {
-    
     if (obstacles.empty()) {
         return false;
     }
@@ -102,9 +107,9 @@ bool FrenetPath::is_collision(const vector<Obstacle *> obstacles) {
     vector<Point> car_outline;
 
     for (auto obstacle : obstacles) {
-        double llx = obstacle->bbox.first.x();
+        double llx = obstacle->bbox.first.x(); //lower left
         double lly = obstacle->bbox.first.y();
-        double urx = obstacle->bbox.second.x();
+        double urx = obstacle->bbox.second.x(); //upper right
         double ury = obstacle->bbox.second.y();
         for (size_t i = 0; i < x.size(); i++) {
         //for (size_t i = 0; i < x.size(); i+=fot_hp->dt/fot_hp->control_t) {
@@ -146,6 +151,10 @@ double FrenetPath::inverse_distance_to_obstacles(
     const vector<Obstacle *> obstacles) {
     double total_inverse_distance = 0.0;
 
+    Pose pose;
+    Car car = Car();
+    vector<Point> car_outline;
+    
     for (auto obstacle : obstacles) {
         double llx = obstacle->bbox.first.x();
         double lly = obstacle->bbox.first.y();
@@ -159,14 +168,30 @@ double FrenetPath::inverse_distance_to_obstacles(
             // double d3 = norm(urx - x[i], ury - y[i]);
             // double d4 = norm(urx - x[i], lly - y[i]);
 
-            double d1 = distance_to_segment(x[i],y[i],llx,lly,llx,ury);
-            double d2 = distance_to_segment(x[i],y[i],llx,ury,urx,ury);
-            double d3 = distance_to_segment(x[i],y[i],urx,ury,urx,lly);
-            double d4 = distance_to_segment(x[i],y[i],urx,lly,llx,lly);
+            // double d1 = distance_to_segment(x[i],y[i],llx,lly,llx,ury);
+            // double d2 = distance_to_segment(x[i],y[i],llx,ury,urx,ury);
+            // double d3 = distance_to_segment(x[i],y[i],urx,ury,urx,lly);
+            // double d4 = distance_to_segment(x[i],y[i],urx,lly,llx,lly);
 
-            double closest = min({d1, d2, d3, d4});
-            //total_inverse_distance += 1.0 / closest;
-            total_inverse_distance = max(total_inverse_distance, 1.0/closest);
+            // double closest = min({d1, d2, d3, d4});
+            // //total_inverse_distance += 1.0 / closest;
+            // total_inverse_distance = max(total_inverse_distance, 1.0/closest);
+
+            pose.assign({x[i], y[i], yaw[i]});
+            car.setPose(pose);
+            car_outline = car.getOutline();
+            vector<point> A;
+            vector<point> B;
+
+            for (size_t j = 0; j < car_outline.size(); j++) {
+                A.push_back(point(car_outline[j][0],car_outline[j][1]));
+            }
+            B.push_back(point(llx,lly));
+            B.push_back(point(urx,lly));
+            B.push_back(point(urx,ury));
+            B.push_back(point(llx,ury));
+            B.push_back(point(llx,lly));
+            total_inverse_distance = max(total_inverse_distance,1/max(getClearance(A,B),1e-6));
         }
     }
     return total_inverse_distance;

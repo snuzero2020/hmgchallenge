@@ -111,7 +111,11 @@ void FrenetOptimalTrajectory::calc_frenet_paths() {
                 lateral_velocity += abs(lat_qp.calc_first_derivative(t));
                 lateral_acceleration += abs(lat_qp.calc_second_derivative(t));
                 lateral_jerk += abs(lat_qp.calc_third_derivative(t));
-                t += fot_hp->control_t;
+                if(t<=2*fot_hp->planning_t){
+                    t += fot_hp->control_t;
+                }else {
+                    t += fot_hp->dt - (ti-t)/(ti-2*fot_hp->planning_t)*(fot_hp->dt - fot_hp->control_t);
+                }
             }
 
             //tv = fot_ic->target_speed - fot_hp->d_t_s * fot_hp->n_s_sample;

@@ -40,6 +40,7 @@ struct FrenetReturnValues {
 struct FrenetHyperparameters {
     double max_speed;
     double max_accel;
+    double max_break;
     double max_curvature;
     double max_road_width_l;
     double max_road_width_r;
@@ -48,6 +49,7 @@ struct FrenetHyperparameters {
     double maxt;
     double mint;
     double target_t;
+    double planning_t;
     double control_t;
     double d_t_s;
     double n_s_sample;

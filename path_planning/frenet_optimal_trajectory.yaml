@@ -1,24 +1,26 @@
 # Hyperparameters
 max_speed: 25.0
 max_accel: 3.0
+max_break : 3.0
 max_curvature: 0.33
-max_road_width_l: 1.1
-max_road_width_r: 1.1
-d_road_w: 0.1
-dt: 0.2
+max_road_width_l: 1.2
+max_road_width_r: 1.2
+d_road_w: 0.2
+dt: 0.3
 maxt: 5.0
 mint: 0.6
 target_t : 3
-control_t : 0.1
+planning_t : 0.1
+control_t : 0.05
 d_t_s: 0.5
-n_s_sample: 2
+n_s_sample: 1
 obstacle_clearance: 0.1
 kd: 1.0
 kv: 0.1
 ka: 0.1
 kj: 0.1
 kt: 100.0
-ko: 75.0
+ko: 10.0
 klat: 1.0
 klon: 0.5
 
@@ -30,12 +32,17 @@ c_d : 0
 c_d_d : 0
 c_d_dd : 0
 
-target_speed: 4
+target_speed: 6
 
-wx : [0, 50, 150]
-wy : [0, 0, 0]
-nw : 3
+wx : [0, 30, 65, 95]
+wy : [0, 2, 18, 20]
+nw : 4
 
-n0 : 4
+o_llx : [25.0, 40.0, 57.0]
+o_lly : [0.4, -2.2, -2.1]
+o_urx : [30.0, 45.0, 62.0]
+o_ury : [2.2, -0.4, -0.3]
+   
+n0 : 0
 obs: [[48, -2, 52, 2], [98, -4, 102, 2], [98, 6, 102, 10], [128, 2, 132, 6]]
 

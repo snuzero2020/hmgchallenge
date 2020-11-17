@@ -93,10 +93,11 @@ bool Obstacle::checkIntersect(Vector2f p1, Vector2f p2, Vector2f l_p1, Vector2f 
 
 int Obstacle::ccw(Vector2f p1, Vector2f p2, Vector2f p3)
 {
+    double EPS = 1e-6;
     double ans = (p2.x()-p1.x()) * (p3.y()-p1.y()) - (p2.y()-p1.y())* (p3.x()-p1.x()); 
-    if (ans < 0) 
+    if (ans > EPS) 
         return 1;
-    else if (ans > 0) 
+    else if (ans < -EPS) 
         return -1;
     else 
         return 0;

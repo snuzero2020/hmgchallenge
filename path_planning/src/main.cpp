@@ -19,14 +19,14 @@ using namespace std;
 //using namespace cv;
 
 int VISUALIZE_IMAGE_SIZE = 100;
-double IMAGE_SCALE = 12.0;
+double IMAGE_SCALE = 10.0;
 int IMAGE_SIZE = VISUALIZE_IMAGE_SIZE * IMAGE_SCALE;
 
 int main(int argc, char** argv) {
     ros::init(argc, argv, "frenet_optimal_trejectory_main");
 
-    double wx [3] = {0, 65, 95};
-    double wy [3] = {0, 0, 0};
+    double wx [4] = {0, 30, 65, 95};
+    double wy [4] = {0, 0, 0, 0};
     double o_llx[3] = {25.0, 40.0, 57.0};
     double o_lly[3] = {0.4, -2.2, -2.1};
     double o_urx[3] = {30.0, 45.0, 62.0};
@@ -39,10 +39,10 @@ int main(int argc, char** argv) {
         0.0,
         0.0,
         0.0,
-        4.0,
+        6.0,
         wx,
         wy,
-        3,
+        4,
         o_llx,
         o_lly,
         o_urx,
@@ -54,6 +54,7 @@ int main(int argc, char** argv) {
     FrenetHyperparameters fot_hp;
     ros::param::get("/max_speed", fot_hp.max_speed);
     ros::param::get("/max_accel", fot_hp.max_accel);
+    ros::param::get("/max_break", fot_hp.max_break);
     ros::param::get("/max_curvature", fot_hp.max_curvature);
     ros::param::get("/max_road_width_l", fot_hp.max_road_width_l);
     ros::param::get("/max_road_width_r", fot_hp.max_road_width_r);
@@ -63,6 +64,7 @@ int main(int argc, char** argv) {
     ros::param::get("/mint", fot_hp.mint);
     ros::param::get("/target_t", fot_hp.target_t);
     ros::param::get("/control_t", fot_hp.control_t);
+    ros::param::get("/planning_t", fot_hp.planning_t);
     ros::param::get("/d_t_s", fot_hp.d_t_s);
     ros::param::get("/n_s_sample", fot_hp.n_s_sample);
     ros::param::get("/obstacle_clearance", fot_hp.obstacle_clearance);
@@ -104,7 +106,8 @@ int main(int argc, char** argv) {
 
         clock_t endTime = clock();
         clock_t elapsed = endTime - startTime;
-        double timeInSecond = (double)(elapsed / CLOCKS_PER_SEC);
+        double timeInSecond = (double)elapsed / CLOCKS_PER_SEC;
+        ROS_WARN("Plan_Time : %lf",timeInSecond);
 
         if (best_frenet_path) {
             cout << "Success\n";
@@ -130,7 +133,7 @@ int main(int argc, char** argv) {
             }
         }
 
-        for (int i=0; i<best_frenet_path->x.size(); i+=fot_hp.dt/fot_hp.control_t){
+        for (int i=0; i<best_frenet_path->x.size(); i++){
             cv::circle(VisWindow, cv::Point(int(IMAGE_SCALE*best_frenet_path->x[i]),IMAGE_SIZE/2 - int(IMAGE_SCALE*best_frenet_path->y[i])),5, cv::Scalar(0, 0, 255));
         }
         Car car_visual;
@@ -162,11 +165,19 @@ int main(int argc, char** argv) {
         fot_ic.c_d_d = best_frenet_path->d_d[1];
         fot_ic.c_d_dd = best_frenet_path->d_dd[1];
 
-        for(int control_count=0; control_count<fot_hp.dt/fot_hp.control_t; control_count++ ){
+        startTime = clock();
+
+        for(int control_count=0; best_frenet_path->t[control_count+1]<fot_hp.planning_t; control_count++ ){
             vector<double> accel_steer = car.findAccelSteer(best_frenet_path->accel[control_count+1],best_frenet_path->c[control_count+1]);
             ROS_WARN("%lf %lf",accel_steer[0],accel_steer[1]);
-            car.setPose(car.simulate(accel_steer[0], accel_steer[1], fot_hp.control_t));
+            car.setPose(car.simulate(accel_steer[0], accel_steer[1], best_frenet_path->t[control_count+1] - best_frenet_path->t[control_count]));
         }
+        ROS_WARN("%lf",best_frenet_path->s_d.back());
+        endTime = clock();
+        elapsed = endTime - startTime;
+        timeInSecond = (double)elapsed / CLOCKS_PER_SEC;
+        ROS_WARN("Control_Time : %lf",timeInSecond);
+
     }
     cv::destroyAllWindows();
     
