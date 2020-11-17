@@ -1,5 +1,6 @@
 #include "frenet_path.h"
 #include "utils.h"
+#include "ros/console.h"
 
 #include <algorithm>
 
@@ -35,7 +36,8 @@ bool FrenetPath::to_global_path(CubicSpline2D* csp) {
         ds.push_back(hypot(dx,dy));
         yaw.push_back(atan2(dy,dx));
         c.push_back( (dx*ddy - ddx*dy) / (hypot(dx,dy)*hypot(dx,dy)*hypot(dx,dy))  );
-        accel.push_back(hypot(ddx,ddy));
+        if(dx*ddx+dy*ddy >=0) accel.push_back(hypot(ddx,ddy));
+        else accel.push_back(-hypot(ddx,ddy));
     }
 
     // if (x.size() <= 1) {
@@ -79,7 +81,7 @@ bool FrenetPath::is_valid_path(const vector<Obstacle *> obstacles) {
             [this](int i){return abs(i) > fot_hp->max_curvature;})) {
         return false;
     }
-    
+    //if(false)return false;
     else if (is_collision(obstacles)) {
         return false;
     }
@@ -105,10 +107,15 @@ bool FrenetPath::is_collision(const vector<Obstacle *> obstacles) {
         double urx = obstacle->bbox.second.x();
         double ury = obstacle->bbox.second.y();
         for (size_t i = 0; i < x.size(); i++) {
+        //for (size_t i = 0; i < x.size(); i+=fot_hp->dt/fot_hp->control_t) {
             double d1 = norm(llx - x[i], lly - y[i]);
             double d2 = norm(llx - x[i], ury - y[i]);
             double d3 = norm(urx - x[i], ury - y[i]);
             double d4 = norm(urx - x[i], lly - y[i]);
+            // double d1 = distance_to_segment(x[i],y[i],llx,lly,llx,ury);
+            // double d2 = distance_to_segment(x[i],y[i],llx,ury,urx,ury);
+            // double d3 = distance_to_segment(x[i],y[i],urx,ury,urx,lly);
+            // double d4 = distance_to_segment(x[i],y[i],urx,lly,llx,lly);
 
             double closest = min({d1, d2, d3, d4});
             if (closest <= COLLISION_CHECK_THRESHOLD) {
@@ -118,12 +125,13 @@ bool FrenetPath::is_collision(const vector<Obstacle *> obstacles) {
                 pose.assign({xp, yp, yawp});
                 car.setPose(pose);
                 car_outline = car.getOutline();
-                for (size_t i = 0; i < car_outline.size(); i++) {
-                    p1.x() = car_outline[i][0];
-                    p1.y() = car_outline[i][1];
-                    p2.x() = car_outline[(i+1) % car_outline.size()][0];
-                    p2.y() = car_outline[(i+1) % car_outline.size()][1];
+                for (size_t j = 0; j < car_outline.size(); j++) {
+                    p1.x() = car_outline[j][0];
+                    p1.y() = car_outline[j][1];
+                    p2.x() = car_outline[(j+1) % car_outline.size()][0];
+                    p2.y() = car_outline[(j+1) % car_outline.size()][1];
                     if (obstacle->isSegmentInObstacle(p1, p2)) {
+                        //ROS_ERROR("p1 : %lf %lf, p2 : %lf %lf, obs : %lf %lf %lf %lf",p1.x(),p1.y(),p2.x(),p2.y(),llx,lly,urx,ury);
                         return true;
                     }
                 }
@@ -143,15 +151,22 @@ double FrenetPath::inverse_distance_to_obstacles(
         double lly = obstacle->bbox.first.y();
         double urx = obstacle->bbox.second.x();
         double ury = obstacle->bbox.second.y();
+        
+        //for (size_t i = 0; i < x.size(); i++) {
+        for (size_t i = 0; i < x.size(); i+=fot_hp->dt/fot_hp->control_t) {
+            // double d1 = norm(llx - x[i], lly - y[i]);
+            // double d2 = norm(llx - x[i], ury - y[i]);
+            // double d3 = norm(urx - x[i], ury - y[i]);
+            // double d4 = norm(urx - x[i], lly - y[i]);
 
-        for (size_t i = 0; i < x.size(); i++) {
-            double d1 = norm(llx - x[i], lly - y[i]);
-            double d2 = norm(llx - x[i], ury - y[i]);
-            double d3 = norm(urx - x[i], ury - y[i]);
-            double d4 = norm(urx - x[i], lly - y[i]);
+            double d1 = distance_to_segment(x[i],y[i],llx,lly,llx,ury);
+            double d2 = distance_to_segment(x[i],y[i],llx,ury,urx,ury);
+            double d3 = distance_to_segment(x[i],y[i],urx,ury,urx,lly);
+            double d4 = distance_to_segment(x[i],y[i],urx,lly,llx,lly);
 
             double closest = min({d1, d2, d3, d4});
-            total_inverse_distance += 1.0 / closest;
+            //total_inverse_distance += 1.0 / closest;
+            total_inverse_distance = max(total_inverse_distance, 1.0/closest);
         }
     }
     return total_inverse_distance;

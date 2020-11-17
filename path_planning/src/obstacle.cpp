@@ -1,5 +1,6 @@
 #include "obstacle.h"
 #include <algorithm>
+#include "ros/console.h"
 
 using namespace Eigen;
 using namespace std;
@@ -85,6 +86,8 @@ bool Obstacle::checkIntersect(Vector2f p1, Vector2f p2, Vector2f l_p1, Vector2f 
             return false;
     }
     
+    //if((x1 <= 0)&&(x2 <= 0)) ROS_ERROR("%lf %lf %lf %lf : %lf %lf %lf %lf",p1.x(),p1.y(),p2.x(),p2.y(),l_p1.x(),l_p1.y(),l_p2.x(),l_p2.y());
+
     return (x1 <= 0)&&(x2 <= 0);
 }
 

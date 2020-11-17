@@ -1,24 +1,26 @@
 # Hyperparameters
 max_speed: 25.0
-max_accel: 15.0
-max_curvature: 15.0
-max_road_width_l: 5.0
-max_road_width_r: 5.0
-d_road_w: 0.5
+max_accel: 3.0
+max_curvature: 0.33
+max_road_width_l: 1.1
+max_road_width_r: 1.1
+d_road_w: 0.1
 dt: 0.2
 maxt: 5.0
-mint: 2.0
+mint: 0.6
+target_t : 3
+control_t : 0.1
 d_t_s: 0.5
-n_s_sample: 2.0
+n_s_sample: 2
 obstacle_clearance: 0.1
 kd: 1.0
 kv: 0.1
 ka: 0.1
 kj: 0.1
-kt: 0.1
-ko: 0.1
+kt: 100.0
+ko: 75.0
 klat: 1.0
-klon: 1.0
+klon: 0.5
 
 # Initial Condition
 s0: 0
@@ -28,7 +30,7 @@ c_d : 0
 c_d_d : 0
 c_d_dd : 0
 
-target_speed: 20
+target_speed: 4
 
 wx : [0, 50, 150]
 wy : [0, 0, 0]

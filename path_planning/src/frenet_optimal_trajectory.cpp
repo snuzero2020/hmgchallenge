@@ -111,10 +111,11 @@ void FrenetOptimalTrajectory::calc_frenet_paths() {
                 lateral_velocity += abs(lat_qp.calc_first_derivative(t));
                 lateral_acceleration += abs(lat_qp.calc_second_derivative(t));
                 lateral_jerk += abs(lat_qp.calc_third_derivative(t));
-                t += fot_hp->dt;
+                t += fot_hp->control_t;
             }
 
-            tv = fot_ic->target_speed - fot_hp->d_t_s * fot_hp->n_s_sample;
+            //tv = fot_ic->target_speed - fot_hp->d_t_s * fot_hp->n_s_sample;
+            tv = min(fot_ic->target_speed, (fot_ic->c_accel/6 + fot_hp->max_accel)*ti) - fot_hp->d_t_s * fot_hp->n_s_sample; 
             while (tv <= fot_ic->target_speed + fot_hp->d_t_s * fot_hp->n_s_sample) {
                 longitudinal_acceleration = 0;
                 longitudinal_jerk = 0;
@@ -163,7 +164,7 @@ void FrenetOptimalTrajectory::calc_frenet_paths() {
                 tfp->c_longitudinal_acceleration = longitudinal_acceleration;
                 tfp->c_longitudinal_jerk = longitudinal_jerk;
                 tfp->c_end_speed_deviation = abs(fot_ic->target_speed - tfp->s_d.back());
-                tfp->c_time_taken = ti;
+                tfp->c_time_taken = ti + fot_hp->target_t*fot_hp->target_t/ti;
                 tfp->c_longitudinal = fot_hp->ka * tfp->c_longitudinal_acceleration + fot_hp->kj * tfp->c_longitudinal_jerk + fot_hp->kt * tfp->c_time_taken + fot_hp->kd * tfp->c_end_speed_deviation;
 
                 tfp->c_inv_dist_to_obstacles = tfp->inverse_distance_to_obstacles(obstacles);

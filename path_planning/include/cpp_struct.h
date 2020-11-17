@@ -47,6 +47,8 @@ struct FrenetHyperparameters {
     double dt;
     double maxt;
     double mint;
+    double target_t;
+    double control_t;
     double d_t_s;
     double n_s_sample;
     double obstacle_clearance;
