@@ -123,7 +123,7 @@ void FrenetOptimalTrajectory::calc_frenet_paths() {
         double target_point = fot_ic->s0 + fot_ic->target_speed*ti; //일단 테스트 용
         vector<FrenetPath1D*> longitudinal_paths = quintic_paths_1D(
             t, fot_ic->s0, fot_ic->c_speed, fot_ic->c_accel, 
-            target_point - fot_hp->max_road_width_r, target_point + fot_hp->d_t_s*fot_hp->n_s_sample, fot_hp->d_road_w, 
+            target_point - fot_hp->max_ds, target_point + fot_hp->max_ds, fot_hp->ds, 
             target_point, fot_ic->target_speed, 0);
 
         for(FrenetPath1D* lateral_path : lateral_paths){

@@ -94,7 +94,7 @@ double CubicSpline2D::find_s(double x, double y, double s0) {
             closest = dist;
             s_closest = si;
         }
-        si += 0.001;
+        si += 0.005;
     } while (si < s[min(ssize-1,i_closest+1)]);
     return s_closest;
 }
