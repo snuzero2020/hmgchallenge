@@ -47,11 +47,12 @@ public:
     double c_lateral = 0.0;
 
     // longitudinal costs
-    double c_longitudinal_acceleration = 0.0;
     double c_longitudinal_jerk = 0.0;
-    double c_time_taken = 0.0;
-    double c_end_speed_deviation = 0.0;
+    double c_longitudinal_end = 0.0;
     double c_longitudinal = 0.0;
+
+    // time costs
+    double c_time_taken = 0.0;
 
     // obstacle costs
     double c_inv_dist_to_obstacles = 0.0;

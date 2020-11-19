@@ -1,30 +1,33 @@
+# In SI Unit
 # Hyperparameters
 max_speed: 25.0
-max_accel: 3.0
-max_break : 3.0
+max_accel: 3.0    #양의 가속도 한계
+max_break : 3.0   #음의 가속도 한계
 max_curvature: 0.33
-max_road_width_l: 1.5
-max_road_width_r: 1.5
-d_road_w: 0.1
-dt: 0.3
-maxt: 5.0
-mint: 0.6
-target_t : 3
-planning_t : 0.1
-control_t : 0.05
-d_t_s: 0.5
-n_s_sample: 1
+max_road_width_l: 1.4   #왼쪽(+l) 탐색 범위
+max_road_width_r: 1.4   #오른쪽(-l) 탐색 범위
+d_road_w: 0.15  #횡(l) 탐색 간격
+max_ds : 0.2    #(점추종) 종(+s,-s) 탐색 범위
+ds : 0.2    #(점추종) 종(s) 탐색 간격
+dt: 0.3   #경로 시간 탐색 간격 (경로 후반부 충돌 판정 간격이기도 함)
+maxt: 5.0   #최대 경로 시간
+mint: 0.6   #최소 경로 시간
+target_t : 3.0    #선호하는 경로 시간
+planning_t : 0.1    #경로 계획 주기 (이 시간마다 planning을 다시 함)
+control_t : 0.05    #제어 주기 (이 시간마다 제어값을 변경시킴)
+d_t_s: 0.5    #(속도 유지) 종(s) 탐색 간격
+n_s_sample: 1   #(속도 유지) 종(+s, -s) 탐색 횟수
 obstacle_clearance: 0.1
-kd: 1.0
-kv: 0.1
-ka: 0.1
-kj: 0.1
-kt: 100.0
-ko: 10.0
-klat: 1.0
-klon: 0.5
+kd: 1.0   #목표와의 차이 비용 계수
+kv: 0.1   #속도 비용 계수
+ka: 0.1   #가속도 비용 계수
+kj: 0.1   #jerk 비용 계수
+kt: 10.0  #시간 비용 계수
+ko: 1.0   #장애물 비용 계수
+klat: 1.0   #횡방향(l) 비용 계수
+klon: 0.5   #종방향(s) 비용 계수
 
-# Initial Condition
+# Initial Condition - not using param yet
 s0: 0
 c_speed : 0
 

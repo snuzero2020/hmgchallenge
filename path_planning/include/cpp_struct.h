@@ -46,6 +46,8 @@ struct FrenetHyperparameters {
     double max_road_width_r;
     double d_road_w;
     double dt;
+    double max_ds;
+    double ds;
     double maxt;
     double mint;
     double target_t;

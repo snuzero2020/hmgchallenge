@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
         o_lly,
         o_urx,
         o_ury,
-        1
+        3
     };
 
 
@@ -60,6 +60,8 @@ int main(int argc, char** argv) {
     ros::param::get("/max_road_width_r", fot_hp.max_road_width_r);
     ros::param::get("/d_road_w", fot_hp.d_road_w);
     ros::param::get("/dt", fot_hp.dt);
+    ros::param::get("/max_ds", fot_hp.max_ds);
+    ros::param::get("/ds", fot_hp.ds);
     ros::param::get("/maxt", fot_hp.maxt);
     ros::param::get("/mint", fot_hp.mint);
     ros::param::get("/target_t", fot_hp.target_t);
@@ -79,11 +81,16 @@ int main(int argc, char** argv) {
 
 
     //working
+    int fail_count = 0;
     vector<double> x,y;
     x.assign(fot_ic.wx, fot_ic.wx + fot_ic.nw);
     y.assign(fot_ic.wy, fot_ic.wy + fot_ic.nw);
     CubicSpline2D *csp = new CubicSpline2D(x, y);
     Car car;
+    PoseState ps_init;
+    ps_init.vx = 6.0;
+    //ps_init.y = 12.0;
+    car.setPose(ps_init);
     
     while(1){
         clock_t startTime = clock();
@@ -111,9 +118,12 @@ int main(int argc, char** argv) {
 
         if (best_frenet_path) {
             cout << "Success\n";
+            fail_count=0;
         }
         else{
             cout << "Failure\n";
+            fail_count++;
+            continue;
         }
 
         cv::Mat VisWindow(IMAGE_SIZE, IMAGE_SIZE, CV_8UC3, cv::Scalar(255, 255, 255));
