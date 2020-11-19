@@ -30,7 +30,7 @@ CubicSpline1D::CubicSpline1D(const vector<double>& v1, const vector<double>& v2)
 }
 
 double CubicSpline1D::calc_der0(double t) {
-    if (t < x.front() || t >= x.back()) {
+    if (t < x.front() || t > x.back()) {
         return NAN;
     }
 
@@ -41,7 +41,7 @@ double CubicSpline1D::calc_der0(double t) {
 }
 
 double CubicSpline1D::calc_der1(double t) {
-    if (t < x.front() || t >= x.back()) {
+    if (t < x.front() || t > x.back()) {
         return NAN;
     }
 
@@ -52,7 +52,7 @@ double CubicSpline1D::calc_der1(double t) {
 }
 
 double CubicSpline1D::calc_der2(double t) {
-    if (t < x.front() || t >= x.back()) {
+    if (t < x.front() || t > x.back()) {
         return NAN;
     }
 
@@ -84,5 +84,6 @@ void CubicSpline1D::vector_b(vector<double> &deltas, VectorXd &result) {
 }
 
 int CubicSpline1D::search_index(double t) {
+    //if(x.back()==t) return x.size()-1;
     return std::upper_bound (x.begin(), x.end(), t) - x.begin();
 }

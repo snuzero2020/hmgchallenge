@@ -28,6 +28,7 @@ void CubicSpline2D::calc_s(const vector<double>& x,
     s.push_back(cum_sum);
     for (int i = 0; i < nx - 1; i++) {
         cum_sum += norm(dx[i], dy[i]);
+        if(isnan(cum_sum)) ROS_ERROR("%lf %lf",dx[i],dy[i]);
         s.push_back(cum_sum);
     }
     s.erase(unique(s.begin(), s.end()), s.end());
@@ -105,16 +106,46 @@ SLState CubicSpline2D::transform(PoseState ps){
     double py = calc_y(sls.s);
     double pyaw = calc_yaw(sls.s);
     double pcurvature = calc_curvature(sls.s);
+    int i = std::upper_bound (s.begin(), s.end(), sls.s) - s.begin();
+    //if(s.back()==sls.s) i=s.size()-1;
+    double erryaw = pyaw - atan2( calc_y(s[i])-calc_y(s[i-1]), calc_x(s[i])-calc_x(s[i-1]) );
     Pose p = ps.getPose();
     p[2] = pyaw;
     PoseState transformed = ps.transform(p);
+    if(1-pcurvature*sls.l<1e-6) ROS_ERROR("too big l");
     sls.l = (ps.x-px)*(-sin(pyaw)) + (ps.y-py)*cos(pyaw);
-    sls.ds = transformed.vx/(1-pcurvature*sls.l);
+    sls.ds = transformed.vx/(1-pcurvature*sls.l)*cos(erryaw);
     sls.dl = transformed.vy;
     sls.dds = transformed.ax/(1-pcurvature*sls.l) + transformed.vx*transformed.vy*pcurvature/((1-pcurvature*sls.l)*(1-pcurvature*sls.l));
-    sls.ddl = transformed.ay + pcurvature*transformed.vx*transformed.vx;
+    sls.dds *= cos(erryaw);
+    sls.ddl = transformed.ay - pcurvature/(1-pcurvature*sls.l)*transformed.vx*transformed.vx;
     return sls;
 }
+
+PoseState CubicSpline2D::sl_to_xy(SLState sls){
+    PoseState ps;
+    double ix_, iy_, iyaw_, icurvature_, di;
+    ix_ = calc_x(sls.s);
+    iy_ = calc_y(sls.s);
+    //if (isnan(ix_) || isnan(iy_)) ROS_ERROR("nan xy");
+    iyaw_ = calc_yaw(sls.s);
+    int i = std::upper_bound (s.begin(), s.end(), sls.s) - s.begin();
+    //if(s.back()==sls.s) i=s.size()-1;
+    double erryaw = iyaw_ - atan2( calc_y(s[i])-calc_y(s[i-1]), calc_x(s[i])-calc_x(s[i-1]) );
+    if(cos(erryaw)<0.9) ROS_ERROR("too big erryaw");
+    
+    icurvature_ = calc_curvature(sls.s);
+    ps.y = sls.l;
+    ps.vx = sls.ds * (1-icurvature_*sls.l) / cos(erryaw);
+    ps.vy = sls.dl;
+    ps.ax = (sls.dds*(1-icurvature_*sls.l) - sls.ds*sls.dl*icurvature_) / cos(erryaw);
+    ps.ay = sls.ddl + icurvature_*(1-icurvature_*sls.l)*sls.ds*sls.ds;
+
+    Pose pose;
+    pose.assign({ix_,iy_,iyaw_});
+    return ps.transform(pose,true);
+}
+
 
 vector<vector<double>>
 CubicSpline2D::remove_collinear_points(vector<double> x, vector<double> y) {

@@ -44,6 +44,28 @@ vector<Point> Car::getOutline(){
     return outline;
 }
 
+vector<point> Car::getCorner(){
+    double x, y, yaw;
+    double tail_x, tail_y, head_x, head_y;
+    
+    x = pose[0];
+    y = pose[1];
+    yaw = pose[2];
+
+    vector<point> corners;
+    tail_x = x - cos(yaw) * tail_length;
+    tail_y = y - sin(yaw) * tail_length;
+    corners.push_back(point(tail_x + cos(yaw + M_PI_2) * width / 2.0, tail_y + sin(yaw + M_PI_2) * width / 2.0));
+    corners.push_back(point(tail_x + cos(yaw - M_PI_2) * width / 2.0, tail_y + sin(yaw - M_PI_2) * width / 2.0));
+    head_x = x + cos(yaw) * head_length;
+    head_y = y + sin(yaw) * head_length;
+    corners.push_back(point(head_x + cos(yaw - M_PI_2) * width / 2.0, head_y + sin(yaw - M_PI_2) * width / 2.0));
+    corners.push_back(point(head_x + cos(yaw + M_PI_2) * width / 2.0, head_y + sin(yaw + M_PI_2) * width / 2.0));
+    
+    return corners;
+}
+
+
 PoseState Car::simulate( double accel, double steer, double dt ){
     PoseState transformed = poseState.transform(poseState.getPose()); //poseState.getPose() == pose
     double curvature = steer*rear_length/(front_length*front_length + rear_length*rear_length);
@@ -52,12 +74,13 @@ PoseState Car::simulate( double accel, double steer, double dt ){
     transformed.vy *= pow(0.5,dt);  //일단 야매임
     
     transformed.ax = accel;
-    transformed.ay = curvature*transformed.vx*transformed.vx;
-    
     transformed.x += transformed.vx*dt + 0.5*transformed.ax*dt*dt;
-    transformed.y += transformed.vy*dt + 0.5*transformed.ay*dt*dt;
     transformed.vx += transformed.ax*dt;
+    
+    transformed.ay = curvature*transformed.vx*transformed.vx;
+    transformed.y += transformed.vy*dt + 0.5*transformed.ay*dt*dt;
     transformed.vy += transformed.ay*dt;
+    
     transformed.yaw += curvature*transformed.x;
     transformed.yaw = remainder(transformed.yaw,2*M_PI);
     transformed.yawrate = curvature*transformed.vx;

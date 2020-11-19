@@ -114,13 +114,23 @@ void FrenetOptimalTrajectory::calc_frenet_paths() {
                 if(t<=2*fot_hp->planning_t){
                     t += fot_hp->control_t;
                 }else {
-                    t += fot_hp->dt - (ti-t)/(ti-2*fot_hp->planning_t)*(fot_hp->dt - fot_hp->control_t);
+                    t += fot_hp->dt;
+                    //t += fot_hp->dt - (ti-t)/(ti-2*fot_hp->planning_t)*(fot_hp->dt - fot_hp->control_t);
                 }
             }
-
-            //tv = fot_ic->target_speed - fot_hp->d_t_s * fot_hp->n_s_sample;
-            tv = min(fot_ic->target_speed, (fot_ic->c_accel/6 + fot_hp->max_accel)*ti) - fot_hp->d_t_s * fot_hp->n_s_sample; 
-            while (tv <= fot_ic->target_speed + fot_hp->d_t_s * fot_hp->n_s_sample) {
+            
+            double target_speed = fot_ic->target_speed;
+            double possible_max_speed = fot_ic->c_speed + (fot_hp->max_accel*2/3 + fot_ic->c_accel*1/6)*ti - fot_hp->d_t_s * fot_hp->n_s_sample;
+            double possible_min_speed = fot_ic->c_speed + (-fot_hp->max_break*2/3 + fot_ic->c_accel*1/6)*ti + fot_hp->d_t_s * fot_hp->n_s_sample;
+            //ROS_WARN(" %lf %lf %lf ", target_speed, possible_max_speed, possible_min_speed);
+            if(target_speed > possible_max_speed){
+                target_speed = possible_max_speed;
+            }
+            else if(target_speed < possible_min_speed){
+                target_speed = possible_min_speed;
+            }
+            tv = target_speed - fot_hp->d_t_s * fot_hp->n_s_sample;
+            while (tv <= target_speed + fot_hp->d_t_s * fot_hp->n_s_sample) {
                 longitudinal_acceleration = 0;
                 longitudinal_jerk = 0;
 

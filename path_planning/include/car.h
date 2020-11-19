@@ -18,43 +18,43 @@ const double VEHICLE_ORGIN_FROM_REAR = VEHICLE_REAR_LENGTH + VEHICLE_REAR_OVERHA
 const double VEHICLE_WIDTH = 1.86;
 
 class Car {
-    private:
-        double front_length; // wheel to mass center
-        double rear_length;
-        //wheel_base = front_length + rear_length;
-        double head_length; // end to orgin
-        double tail_length;
-        //total_length = head_length + tail_length;
-        double width;
-    
-    public:
-        Pose pose; // x, y, yaw
-        PoseState poseState; // x, y, yaw, vx, vy, yawrate, ax, ay
-    
-        Car(){
-            front_length = VEHICLE_FRONT_LENGTH;
-            rear_length = VEHICLE_REAR_LENGTH;
-            head_length = VEHICLE_FRONT_OVERHANG + VEHICLE_FRONT_LENGTH + VEHICLE_REAR_LENGTH + VEHICLE_REAR_OVERHANG - VEHICLE_ORGIN_FROM_REAR;
-            tail_length = VEHICLE_ORGIN_FROM_REAR;
-            width = VEHICLE_WIDTH;
-            pose.push_back(0);
-            pose.push_back(0);
-            pose.push_back(0);
-            setPose(pose);
-        };
-        Car(Pose pose_): pose(pose_) {
-            front_length = VEHICLE_FRONT_LENGTH;
-            rear_length = VEHICLE_REAR_LENGTH;
-            head_length = VEHICLE_FRONT_OVERHANG + VEHICLE_FRONT_LENGTH + VEHICLE_REAR_LENGTH + VEHICLE_REAR_OVERHANG - VEHICLE_ORGIN_FROM_REAR;
-            tail_length = VEHICLE_ORGIN_FROM_REAR;
-            width = VEHICLE_WIDTH;
-            setPose(pose);
-        };
-        void setPose(Pose p);
-        void setPose(PoseState ps);
-        vector<Point> getOutline();
-        PoseState simulate( double accel, double steer, double dt );
-        vector<double> findAccelSteer( double accel, double curvature );
+ public:
+    double front_length; // wheel to mass center
+    double rear_length;
+    //wheel_base = front_length + rear_length;
+    double head_length; // end to orgin
+    double tail_length;
+    //total_length = head_length + tail_length;
+    double width;
+
+    Pose pose; // x, y, yaw
+    PoseState poseState; // x, y, yaw, vx, vy, yawrate, ax, ay
+
+    Car(){
+        front_length = VEHICLE_FRONT_LENGTH;
+        rear_length = VEHICLE_REAR_LENGTH;
+        head_length = VEHICLE_FRONT_OVERHANG + VEHICLE_FRONT_LENGTH + VEHICLE_REAR_LENGTH + VEHICLE_REAR_OVERHANG - VEHICLE_ORGIN_FROM_REAR;
+        tail_length = VEHICLE_ORGIN_FROM_REAR;
+        width = VEHICLE_WIDTH;
+        pose.push_back(0);
+        pose.push_back(0);
+        pose.push_back(0);
+        setPose(pose);
+    };
+    Car(Pose pose_): pose(pose_) {
+        front_length = VEHICLE_FRONT_LENGTH;
+        rear_length = VEHICLE_REAR_LENGTH;
+        head_length = VEHICLE_FRONT_OVERHANG + VEHICLE_FRONT_LENGTH + VEHICLE_REAR_LENGTH + VEHICLE_REAR_OVERHANG - VEHICLE_ORGIN_FROM_REAR;
+        tail_length = VEHICLE_ORGIN_FROM_REAR;
+        width = VEHICLE_WIDTH;
+        setPose(pose);
+    };
+    void setPose(Pose p);
+    void setPose(PoseState ps);
+    vector<Point> getOutline();
+    vector<point> getCorner();
+    PoseState simulate( double accel, double steer, double dt );
+    vector<double> findAccelSteer( double accel, double curvature );
 };
 
 #endif

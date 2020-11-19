@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
     ros::init(argc, argv, "frenet_optimal_trejectory_main");
 
     double wx [4] = {0, 30, 65, 95};
-    double wy [4] = {0, 0, 0, 0};
+    double wy [4] = {0, 4, 36, 40};
     double o_llx[3] = {25.0, 40.0, 57.0};
     double o_lly[3] = {0.4, -2.2, -2.1};
     double o_urx[3] = {30.0, 45.0, 62.0};
@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
         o_lly,
         o_urx,
         o_ury,
-        3
+        1
     };
 
 
@@ -84,7 +84,7 @@ int main(int argc, char** argv) {
     y.assign(fot_ic.wy, fot_ic.wy + fot_ic.nw);
     CubicSpline2D *csp = new CubicSpline2D(x, y);
     Car car;
-
+    
     while(1){
         clock_t startTime = clock();
 
@@ -167,7 +167,7 @@ int main(int argc, char** argv) {
 
         startTime = clock();
 
-        for(int control_count=0; best_frenet_path->t[control_count+1]<fot_hp.planning_t; control_count++ ){
+        for(int control_count=0; best_frenet_path->t[control_count]<fot_hp.planning_t; control_count++ ){
             vector<double> accel_steer = car.findAccelSteer(best_frenet_path->accel[control_count+1],best_frenet_path->c[control_count+1]);
             ROS_WARN("%lf %lf",accel_steer[0],accel_steer[1]);
             car.setPose(car.simulate(accel_steer[0], accel_steer[1], best_frenet_path->t[control_count+1] - best_frenet_path->t[control_count]));

@@ -3,9 +3,9 @@ max_speed: 25.0
 max_accel: 3.0
 max_break : 3.0
 max_curvature: 0.33
-max_road_width_l: 1.2
-max_road_width_r: 1.2
-d_road_w: 0.2
+max_road_width_l: 1.5
+max_road_width_r: 1.5
+d_road_w: 0.1
 dt: 0.3
 maxt: 5.0
 mint: 0.6

@@ -23,6 +23,7 @@ class CubicSpline2D{
         double calc_yaw(double t);
         double find_s(double x, double y, double s0);
         SLState transform(PoseState ps);
+        PoseState sl_to_xy(SLState sls);
         double calc_s_length();
 };
 

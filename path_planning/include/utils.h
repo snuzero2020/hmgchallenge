@@ -4,6 +4,8 @@
 #include <cmath>
 #include <tuple>
 #include <vector>
+#include <stack>
+#include <ros/console.h>
 
 using namespace std;
 
@@ -11,6 +13,7 @@ typedef vector<double> Point;
 typedef vector<double> Pose;
 
 const double INF = 1e9;
+const double EPS = 1e-6;
 
 class PoseState{
     public:
@@ -87,20 +90,43 @@ inline double dot(const tuple<double, double>& vec1, const tuple<double, double>
 
 struct point{
     double x,y;
+    double theta;
     point() : point(0,0){}
-    point(double x1, double y1): x(x1),y(y1){}
+    point(double x1, double y1): x(x1),y(y1), theta(0){}
+    void update(point p){
+        theta = atan2(y-p.y,x-p.x);
+    }
+    bool operator <(const point& o){
+        if(abs(theta-o.theta)>EPS) return theta<o.theta;
+        if(abs(y-o.y)>EPS) return y<o.y;
+        return x<o.x;
+    }
 };
 
 struct line{
     point s,e;
     line(): line(0,0,0,0){}
-    line(double x1, double y1, double x2, double y2){
-        point p1 = point(x1,y1);
-        point p2 = point(x2,y2);
-        line(p1,p2);
-    }
+    line(double x1, double y1, double x2, double y2):s(x1,y1),e(x2,y2){}
     line(point p1, point p2):s(p1),e(p2){}
 };
+
+inline int ccw(const point &a, const point &b, const point &c){
+    double rt = (b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x);
+    if(abs(rt)<EPS)return 0;
+    if(rt<0) return -1;
+    return 1;
+}
+
+inline bool intersect(line l1, line l2){
+    int ab = ccw(l1.s,l1.e, l2.s)*ccw(l1.s,l1.e,l2.e);
+    int cd = ccw(l2.s,l2.e,l1.s)*ccw(l2.s,l2.e,l1.e);
+
+    if(ab==0 && cd ==0){
+        if((l1.s.x>l2.s.x && l1.s.x>l2.e.x&&l1.e.x>l2.s.x&&l1.e.x>l2.e.x) ||(l1.s.x<l2.s.x && l1.s.x<l2.e.x&&l1.e.x<l2.s.x&&l1.e.x<l2.e.x)) return false;
+        if((l1.s.y>l2.s.y && l1.s.y>l2.e.y&&l1.e.y>l2.s.y&&l1.e.y>l2.e.y) ||(l1.s.y<l2.s.y && l1.s.y<l2.e.y&&l1.e.y<l2.s.y&&l1.e.y<l2.e.y)) return false;
+    }
+    return (ab<=0)&&(cd<=0);
+}
 
 inline double sq(double x){ return x*x;}
 
@@ -162,6 +188,80 @@ inline double distance_to_segment(double x, double y, double x1, double y1, doub
     return min<double>(dist(p,l.s),dist(p,l.e));
 }
 
+struct ConvexHull{
+    public:
+    vector<point> p;
+    int size;
+
+    ConvexHull(){
+        size = 0;
+    }
+    ConvexHull(vector<point> v){
+        size = 0;
+        if(v.size()<3) {
+            p=v;
+            ROS_ERROR("ConvexHull Error : few point");
+        }
+        sort(v.begin(), v.end());
+        for(int i=1;i<v.size();i++) v[i].update(v[0]);
+        sort(v.begin()+1, v.end());
+        stack<int> s;
+        s.push(0);
+        s.push(1);
+        int next = 2;
+        while(next<v.size()){
+            while(s.size()>=2){
+                int first, second;
+                first = s.top();
+                s.pop();
+                second = s.top();
+                if(ccw(v[second],v[first],v[next])>0){
+                    s.push(first);
+                    break;
+                }
+            }
+            s.push(next);
+            next++;
+        }
+        while(!s.empty()){
+            p.push_back(v[s.top()]);
+            s.pop();
+            size++;
+        }
+    }
+};
+
+inline bool checkCollision(ConvexHull a, ConvexHull b){
+    for(int i=0;i<a.size;i++){
+        for(int j=0;j<b.size;j++){
+            line l1 = line(a.p[(i%a.size)],a.p[((i+1)%a.size)]);
+            line l2 = line(b.p[(j%b.size)],b.p[((j+1)%b.size)]);
+            if(intersect(l1,l2)) return true;
+        }
+    }
+
+    bool check = true;
+    point p = b.p[0];
+    int val = ccw(p,a.p[a.size-1],a.p[0]);
+    for(int i=0;i<a.size-1;i++){
+        if(ccw(p,a.p[i],a.p[i+1])!=val) {
+            check = false;
+            break;
+        }
+    }
+    if(check) return true;
+    check = true;
+    p=a.p[0];
+    val = ccw(p,b.p[b.size-1],b.p[0]);
+    for(int i=0;i<b.size-1;i++){
+        if(ccw(p,b.p[i],b.p[i+1])){
+            check = false;
+            break;
+        }
+    }
+    if(check) return true;
+    return false;
+}
 /*inline double distance_to_segment(double x, double y, double x1, double y1, double x2, double y2){
     double dx2 = x2 - x1;
     double dy2 = y2 - y1;
